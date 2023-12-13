@@ -1,0 +1,25 @@
+int BTN=2;
+int GSM=3;
+int GPS=4;
+void setup() {
+Serial.begin(9600);
+pinMode(GSM,OUTPUT);  
+pinMode(GPS,OUTPUT);
+pinMode(BTN,INPUT_PULLUP); 
+}
+
+void loop() {
+if (digitalRead(BTN)==LOW)
+{
+digitalWrite(GPS,HIGH);
+  Serial.println("Getting cordinate");
+  delay(5000);
+  digitalWrite(GPS,LOW);
+  digitalWrite(GSM,HIGH);
+  Serial.println("Sending location cordinate");
+  delay(1000);
+  Serial.println("coordinate sent");
+  digitalWrite(GSM,LOW);
+}
+
+}
