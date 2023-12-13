@@ -1,0 +1,86 @@
+#define LED1 2
+#define LED10 11
+#define LED_ON 100
+
+#define TEMP_SENS_PIN A0
+#define LIGHT_SENS_PIN A1
+
+#define BUZZER_PIN 13
+#define BUTTON_PIN 12
+
+#define THRESHOLD 200  /*BORDERLINE OF FREQUENCY.When
+                         exceeded will activate the  sound
+                           system*/
+
+int temperature =0;
+int lightness= 0;
+int countLeds=0; //counting led number .Which will use start bar graph.
+boolean previous=true;
+boolean trigger=false;
+
+
+void setup()
+{
+  for(int i=LED1;i<=LED10 ;i++)
+  {pinMode(i,OUTPUT);}
+  
+    pinMode(BUZZER_PIN,OUTPUT);
+    pinMode(BUTTON_PIN , INPUT);
+  
+  
+ Serial.begin (9600); //estblishing connection with computer
+ Serial.print("t for temperature, l for lightness");
+  
+}
+void loop()
+{ 
+  
+  temperature = analogRead(TEMP_SENS_PIN );
+  lightness = analogRead(LIGHT_SENS_PIN);
+   
+  if (Serial.available()>0)
+  {
+    char mode = Serial.read();
+    if(mode =='t' || mode== 'T')
+    {
+      Serial.print("Temperature :");
+      Serial.print("\t");
+      Serial.println(temperature);
+    }
+    if(mode =='l' || mode=='L')
+    {
+       Serial.print("Lightness :");
+       Serial.print("\t");
+       Serial.println(lightness);
+    }
+  }
+    
+  boolean current=digitalRead(BUTTON_PIN);
+  if(current && previous)
+  {
+    trigger=!trigger;
+  }
+  previous=current; 
+  
+  if(trigger)
+  {
+    countLeds=temperature;
+  }
+  else
+  {
+    countLeds=lightness;
+  }
+  
+  int lastLed=map(countLeds ,0 ,500,2,11);
+  
+  for(int i=LED1;i<=lastLed;i++)
+  { 
+    digitalWrite(i,HIGH);
+    delay(LED_ON);
+    digitalWrite(i,LOW);
+  }
+  if(temperature>THRESHOLD)
+  {
+    tone(BUZZER_PIN,1000,1000);
+  }
+}
